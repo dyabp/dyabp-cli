@@ -1,2 +1,2 @@
 # dyabp-cli
-.Net Cli for abp crud
+.Net Cli for abp crud functions
