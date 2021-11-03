@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,22 +13,32 @@ namespace Dyabp.Cli
     {
         public static async Task<int> Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
             Log.Logger = new LoggerConfiguration()
-#if DEBUG
-                .MinimumLevel.Debug()
-#else
                 .MinimumLevel.Information()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("Volo.Abp", LogEventLevel.Warning)
+                .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
+#if DEBUG
+                .MinimumLevel.Override("Volo.Abp.Cli", LogEventLevel.Debug)
+#else
+                .MinimumLevel.Override("Volo.Abp.Cli", LogEventLevel.Information)
 #endif
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
-                .WriteTo.Async(c => c.File("Logs/logs.txt"))
-                .WriteTo.Async(c => c.Console())
+                .WriteTo.File(Path.Combine(DyabpCliPaths.Log, "dyabp-cli-logs.txt"))
+                .WriteTo.Console()
                 .CreateLogger();
 
             try
             {
                 Log.Information("Starting console host.");
-                await CreateHostBuilder(args).RunConsoleAsync();
+
+                await CreateHostBuilder(args)
+                    .Build()
+                    .Services.GetRequiredService<DyabpCliService>()
+                    .RunAsync(args);
+
                 return 0;
             }
             catch (Exception ex)
@@ -52,7 +63,7 @@ namespace Dyabp.Cli
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddApplication<CliModule>();
+                    services.AddApplication<DyabpCliModule>();
                 });
     }
 }

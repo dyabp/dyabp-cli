@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Dyabp.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "new dyabp -t console"
+    }
+  }
+}

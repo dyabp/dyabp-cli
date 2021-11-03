@@ -5,18 +5,17 @@ using Volo.Abp.Modularity;
 
 namespace Dyabp.Cli
 {
-
     [DependsOn(
-        typeof(AbpAutofacModule)
+        typeof(AbpAutofacModule),
+        typeof(DyabpCliCoreModule)
     )]
-    public class CliModule : AbpModule
+    public class DyabpCliModule : AbpModule
     {
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
             var hostEnvironment = context.Services.GetSingletonInstance<IHostEnvironment>();
 
-            context.Services.AddHostedService<CliHostedService>();
         }
     }
 }

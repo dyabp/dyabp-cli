@@ -251,5 +251,6 @@ paket-files/
 .idea/
 *.sln.iml
 
-# Cli
+# Dyabp Cli
 src/Dyabp.Cli.ConsoleApp/Logs/logs.txt
+nupkg/

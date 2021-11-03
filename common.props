@@ -3,5 +3,13 @@
     <LangVersion>latest</LangVersion>
     <Version>0.1.0</Version>
     <NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>
+	<Authors>Gerry Ge</Authors>
+	<Company>DYCHAR.COM</Company>
+	<PackageIconUrl>https://dyabp.github.io/logo.png</PackageIconUrl>
+    <PackageProjectUrl>https://dyabp.github.io/</PackageProjectUrl>
+    <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/dyabp/dyabp.cli/</RepositoryUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 </Project>
