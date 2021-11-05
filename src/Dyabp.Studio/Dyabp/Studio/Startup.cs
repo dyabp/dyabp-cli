@@ -23,7 +23,7 @@ namespace Dyabp.Studio
             AbpApplicationBuilderExtensions.InitializeApplication(app);
             appLifetime.ApplicationStarted.Register(() =>
             {
-                Console.WriteLine("Opening" + studioOptions.Value.ApplicationUrl);
+                Console.WriteLine("Opening " + studioOptions.Value.ApplicationUrl);
                 Run(studioOptions.Value.ApplicationUrl);
             });
             appLifetime.ApplicationStopped.Register(() =>

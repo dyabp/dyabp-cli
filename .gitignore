@@ -252,5 +252,6 @@ paket-files/
 *.sln.iml
 
 # Dyabp Cli
-src/Dyabp.Cli.ConsoleApp/Logs/logs.txt
+src/Dyabp.Cli/Logs/*.*
 nupkg/
+src/Dyabp.Studio/Logs/*.*

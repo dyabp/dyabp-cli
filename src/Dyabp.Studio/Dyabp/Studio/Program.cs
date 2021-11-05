@@ -1,10 +1,13 @@
 ﻿using Dyabp.Studio.Core;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
+using Serilog.Extensions.Logging;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -32,22 +35,22 @@ namespace Dyabp.Studio
 
             LogSet(configurationRoot, StudioConsts.LogPath, "studio-log-.txt");
 
-//            Log.Logger = new LoggerConfiguration()
-//#if DEBUG
-//                .MinimumLevel.Debug()
-//#else
-//                .MinimumLevel.Information()
-//#endif
-//                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-//                .Enrich.FromLogContext()
-//                .WriteTo.Async(c => c.File("Logs/logs.txt"))
-//                .WriteTo.Async(c => c.Console())
-//                .CreateLogger();
+            LoggerConfiguration loggerConfiguration = ConfigurationLoggerConfigurationExtensions.Configuration(new LoggerConfiguration().MinimumLevel.Debug().MinimumLevel
+                .Override("Microsoft", LogEventLevel.Information)
+                .Enrich
+                .FromLogContext()
+                .ReadFrom, configurationRoot);
+
+            Log.Logger = loggerConfiguration.CreateLogger();
+
+            DyabpStudioOptions dyabpStudioOptions = new DyabpStudioOptions();
+            configurationRoot.GetSection("DyabpStudio").Bind(dyabpStudioOptions);
 
             try
             {
-                //Log.Information("Starting console host.");
-                await CreateHostBuilder(args).RunConsoleAsync();
+                Log.Information("Dyabp studio log test.");
+                using IHost host = CreateHostBuilder(args, dyabpStudioOptions.ApplicationUrl, StudioConsts.ContentRootPath).Build();
+                await host.RunAsync();
             }
             catch (Exception ex)
             {
@@ -57,21 +60,26 @@ namespace Dyabp.Studio
             {
                 Log.CloseAndFlush();
             }
-
+            BruteForceKillTheApplication();
         }
 
-        internal static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseAutofac()
-                .UseSerilog()
-                .ConfigureAppConfiguration((context, config) =>
+        internal static IHostBuilder CreateHostBuilder(string[] args, string applicationUrl, string contentRoot)
+        {
+            return SerilogHostBuilderExtensions.UseSerilog(
+                AbpAutofacHostBuilderExtensions.UseAutofac(
+                    AbpHostingHostBuilderExtensions.AddAppSettingsSecretsJson(Host.CreateDefaultBuilder(args), true, true, "appsettings.secrets.json")
+                    .ConfigureWebHostDefaults(webBuilder =>
+                    {
+                        webBuilder.UseStartup<Startup>()
+                        .UseUrls(applicationUrl)
+                        .UseContentRoot(contentRoot);
+                    })))
+                .UseContentRoot(contentRoot)
+                .UseConsoleLifetime(opts =>
                 {
-                    //setup your additional configuration sources
-                })
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.AddApplication<DyabpStudioWebModule>();
+                    opts.SuppressStatusMessages = true;
                 });
+        }
 
         private static void LogSet(IConfiguration configuration, string logPath, string logName = "studio-log-.txt")
         {
@@ -79,6 +87,18 @@ namespace Dyabp.Studio
             int num = section.GetChildren().Count();
             for (int i = 0; i < num; i++)
             {
+            }
+        }
+
+        public static void BruteForceKillTheApplication()
+        {
+            try
+            {
+                Process.GetCurrentProcess().Kill();
+            }
+            catch (Exception value)
+            {
+                Console.WriteLine(value);
             }
         }
     }
