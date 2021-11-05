@@ -54,4 +54,10 @@
 		<ProjectReference Include="..\Dyabp.Cli.Core\Dyabp.Cli.Core.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Dyabp\Studio\Controllers\" />
+	  <Folder Include="Dyabp\Studio\Models\" />
+	  <Folder Include="Dyabp\Studio\Services\" />
+	</ItemGroup>
+
 </Project>
